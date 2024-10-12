@@ -1,10 +1,14 @@
-﻿namespace TestConsoleApp
+﻿using AleksandarNaumovic.EntryPoint;
+
+namespace TestConsoleApp
 {
 	internal class Program
 	{
-		static void Main(string[] args)
+		static void Main(string[] arguments)
 		{
-			Console.WriteLine("Hello, World!");
+			EntryPointConfiguration config = new EntryPointConfiguration();
+
+			Console.WriteLine(EntryPoint.GetInstance(config).Execute(arguments));
 		}
 	}
 }
