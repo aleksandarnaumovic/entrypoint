@@ -2,6 +2,6 @@
 {
 	internal interface IParametersParser
 	{
-		public IDictionary<string, string> Parse(string[] input);
+		public IDictionary<string, string> Parse(string[] input, IList<ParameterInfo> info);
 	}
 }
