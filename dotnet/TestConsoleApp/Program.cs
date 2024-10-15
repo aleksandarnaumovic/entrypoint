@@ -7,6 +7,9 @@ namespace TestConsoleApp
 		static void Main(string[] arguments)
 		{
 			EntryPointConfiguration config = new EntryPointConfiguration();
+			config.DefaultMessage = "Program koji radi nesto";
+
+			
 
 			Console.WriteLine(EntryPoint.GetInstance(config).Execute(arguments));
 		}

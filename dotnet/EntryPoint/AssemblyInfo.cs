@@ -18,3 +18,4 @@ using System.Runtime.InteropServices;
 [assembly: Guid("5135e8a5-3074-4f5e-b6cd-40e947258f26")]
 
 [assembly: InternalsVisibleTo("AleksandarNaumovic.EntryPoint.Test")]
+[assembly: InternalsVisibleTo("DynamicProxyGenAssembly2")]

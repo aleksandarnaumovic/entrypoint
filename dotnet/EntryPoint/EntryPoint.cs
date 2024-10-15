@@ -1,14 +1,30 @@
-﻿namespace AleksandarNaumovic.EntryPoint
+﻿using AleksandarNaumovic.EntryPoint.Commands;
+
+namespace AleksandarNaumovic.EntryPoint
 {
 	public class EntryPoint
 	{
-		internal EntryPoint(EntryPointConfiguration configuration) 
+		private readonly EntryPointConfiguration configuration;
+		private readonly IParametersParser parser;
+
+		internal EntryPoint(EntryPointConfiguration configuration, IParametersParser parser)
 		{
+			this.configuration = configuration;
+			this.parser = parser;
 		}
 
 		public string Execute(string[] arguments)
 		{
-			return "\r\nEntryPoint v1.0.0 (C) Aleksandar Naumovic 2024.";
+			// arguments at first two positions are by convention verb and subject. That could be extended by more complex scenarios later
+			ICommand command = configuration.CommandRegistry.Get(arguments[0], arguments[1]);
+			IList<ParameterInfo> info = command.ParametersDefinition;
+
+			IDictionary<string, string> parameters = parser.Parse(arguments.Skip(2).ToArray(), info);
+
+			command.AddParameters(parameters);
+			command.Execute();
+
+			return configuration.DefaultMessage + "\r\n" + command.Result;
 		}
 
 		#region singleton
@@ -19,7 +35,7 @@
 		{
 			if (instance == null)
 			{
-				instance = new EntryPoint(configuration);
+				instance = new EntryPoint(configuration, new ParametersParser());
 			}
 			return instance;
 		}
