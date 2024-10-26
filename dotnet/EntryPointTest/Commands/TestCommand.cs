@@ -25,5 +25,15 @@ namespace AleksandarNaumovic.EntryPoint.Test.Commands
 		{
 			this.result = result;
 		}
+
+		public override string Description
+		{
+			get { return "Test command should do the test."; }
+		}
+
+		override public string Usage
+		{
+			get { return "Test command should be used the following way."; }
+		}
 	}
 }

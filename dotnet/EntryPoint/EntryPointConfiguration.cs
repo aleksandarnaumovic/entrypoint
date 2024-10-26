@@ -10,7 +10,7 @@ namespace AleksandarNaumovic.EntryPoint
 		public EntryPointConfiguration()
 		{
 			commandRegistry = new CommandRegistry();
-			defaultMessage = "\r\nEntryPoint v1.0.0 (C) Aleksandar Naumovic 2024.";
+			defaultMessage = Messages.DefaultMessage;
 		}
 
 		public string DefaultMessage

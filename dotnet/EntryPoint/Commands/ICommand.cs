@@ -9,5 +9,9 @@
 		public void Execute();
 
 		public string Result { get; }
+
+		public string Description { get; }
+
+		public string Usage {  get; }
 	}
 }

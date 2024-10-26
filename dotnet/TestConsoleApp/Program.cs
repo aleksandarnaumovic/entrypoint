@@ -1,4 +1,5 @@
 ﻿using AleksandarNaumovic.EntryPoint;
+using AleksandarNaumovic.EntryPoint.TestConsoleApp.Commands;
 
 namespace TestConsoleApp
 {
@@ -7,9 +8,10 @@ namespace TestConsoleApp
 		static void Main(string[] arguments)
 		{
 			EntryPointConfiguration config = new EntryPointConfiguration();
-			config.DefaultMessage = "Program koji radi nesto";
+			//config.DefaultMessage = "Software which should do something.";
 
-			
+			config.AddCommand("do", "something", new DoSomethingCommand());
+			config.AddCommand("do", "another", new DoAnotherCommand());
 
 			Console.WriteLine(EntryPoint.GetInstance(config).Execute(arguments));
 		}

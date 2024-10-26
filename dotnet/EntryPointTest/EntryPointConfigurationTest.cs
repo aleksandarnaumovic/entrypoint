@@ -19,7 +19,7 @@ namespace AleksandarNaumovic.EntryPoint.Test
 		[Test]
 		public void TestDefaultMessage()
 		{
-			Assert.AreEqual("\r\nEntryPoint v1.0.0 (C) Aleksandar Naumovic 2024.", config.DefaultMessage);
+			Assert.AreEqual("EntryPoint v1.0.0 (C) Aleksandar Naumovic 2024.", config.DefaultMessage);
 		}
 
 		[Test]

@@ -1,4 +1,6 @@
-﻿namespace AleksandarNaumovic.EntryPoint.Commands
+﻿using System.Text;
+
+namespace AleksandarNaumovic.EntryPoint.Commands
 {
 	internal class CommandRegistry : ICommandRegistry
 	{
@@ -11,12 +13,12 @@
 
 		public void Register(string verb, string subject, ICommand command)
 		{
-			GetCommand(verb).Add(subject, command);
+			GetCommandsForVerb(verb).Add(subject, command);
 		}
 
-		private IDictionary<string, ICommand> GetCommand(string verb)
+		private IDictionary<string, ICommand> GetCommandsForVerb(string verb)
 		{
-			if (!commands.ContainsKey(verb)) 
+			if (!commands.ContainsKey(verb))
 			{
 				commands.Add(verb, new Dictionary<string, ICommand>());
 			}
@@ -30,6 +32,21 @@
 				return null;
 			}
 			return commands[verb][subject];
+		}
+
+		public string GetRegisteredDescriptions()
+		{
+			StringBuilder builder = new StringBuilder();
+
+			foreach (string verb in commands.Keys)
+			{
+				foreach (string subject in commands[verb].Keys)
+				{
+					builder.AppendLine($"{verb} {subject} - {commands[verb][subject].Description}");
+				}
+			}
+
+			return builder.ToString();
 		}
 	}
 }

@@ -1,6 +1,6 @@
 ﻿namespace AleksandarNaumovic.EntryPoint.Commands
 {
-	internal abstract class AbstractCommand : ICommand
+	public abstract class AbstractCommand : ICommand
 	{
 		public abstract IList<ParameterInfo> ParametersDefinition { get; }
 
@@ -22,5 +22,9 @@
 				return result;
 			}
 		}
+
+		public abstract string Description { get; }
+
+		public abstract string Usage { get; }
 	}
 }
