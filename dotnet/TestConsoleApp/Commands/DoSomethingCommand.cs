@@ -24,6 +24,9 @@ namespace AleksandarNaumovic.EntryPoint.TestConsoleApp.Commands
 
 		public override void Execute()
 		{
+			outputWriter.WriteLine("Write for the first time from do something command.");
+			outputWriter.WriteLine("Write for the second time from do something command.");
+			
 			result = "Doing something";
 		}
 	}

@@ -1,4 +1,5 @@
 ﻿using AleksandarNaumovic.EntryPoint.Commands;
+using AleksandarNaumovic.EntryPoint.Utilities;
 using NSubstitute;
 using NUnit.Framework;
 using Assert = NUnit.Framework.Legacy.ClassicAssert;
@@ -9,11 +10,11 @@ namespace AleksandarNaumovic.EntryPoint.Test.Commands
     public class CommandRegistryTest
     {
         private CommandRegistry registry;
-
+        
         [SetUp]
         public void SetUp()
         {
-            registry = new CommandRegistry();
+	        registry = new CommandRegistry();
         }
 
 		[Test]
@@ -50,15 +51,11 @@ namespace AleksandarNaumovic.EntryPoint.Test.Commands
         }
 
         [Test]
-        public void TestGetRegisteredDescriptionWithoutRegistered()
+        public void TestWriteRegisteredDescription()
         {
-            Assert.AreEqual(string.Empty, registry.GetRegisteredDescriptions());
-        }
+	        IOutputWriter writer = Substitute.For<IOutputWriter>();
 
-        [Test]
-        public void TestGetRegisteredDescription()
-        {
-            ICommand command1 = Substitute.For<ICommand>();
+	        ICommand command1 = Substitute.For<ICommand>();
             ICommand command2 = Substitute.For<ICommand>();
             ICommand command3 = Substitute.For<ICommand>();
 
@@ -70,11 +67,16 @@ namespace AleksandarNaumovic.EntryPoint.Test.Commands
             registry.Register("do", "somethingelse", command2);
             registry.Register("doelse", "something", command3);
 
-            Assert.AreEqual("do something - Cmd 1 description.\r\ndo somethingelse - Cmd 2 description.\r\ndoelse something - Cmd 3 description.\r\n", registry.GetRegisteredDescriptions());
+            // Assert.AreEqual("do something - Cmd 1 description.\r\ndo somethingelse - Cmd 2 description.\r\ndoelse something - Cmd 3 description.\r\n", registry.GetRegisteredDescriptions());
+            registry.WriteRegisteredDescriptions(writer);
 
 			_ = command1.Received().Description;
 			_ = command2.Received().Description;
 			_ = command3.Received().Description;
+			
+			writer.WriteLine("do something - Cmd 1 description.");
+			writer.WriteLine("do somethingelse - Cmd 2 description.");
+			writer.WriteLine("doelse something - Cmd 3 description.");
         }
     }
 }

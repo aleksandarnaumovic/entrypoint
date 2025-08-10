@@ -13,7 +13,7 @@ namespace TestConsoleApp
 			config.AddCommand("do", "something", new DoSomethingCommand());
 			config.AddCommand("do", "another", new DoAnotherCommand());
 
-			Console.WriteLine(EntryPoint.GetInstance(config).Execute(arguments));
+			EntryPoint.GetInstance(config).Execute(arguments);
 		}
 	}
 }

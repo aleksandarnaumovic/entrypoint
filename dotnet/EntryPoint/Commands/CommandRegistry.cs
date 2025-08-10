@@ -1,4 +1,4 @@
-﻿using System.Text;
+﻿using AleksandarNaumovic.EntryPoint.Utilities;
 
 namespace AleksandarNaumovic.EntryPoint.Commands
 {
@@ -34,19 +34,15 @@ namespace AleksandarNaumovic.EntryPoint.Commands
 			return commands[verb][subject];
 		}
 
-		public string GetRegisteredDescriptions()
+		public void WriteRegisteredDescriptions(IOutputWriter writer)
 		{
-			StringBuilder builder = new StringBuilder();
-
 			foreach (string verb in commands.Keys)
 			{
 				foreach (string subject in commands[verb].Keys)
 				{
-					builder.AppendLine($"{verb} {subject} - {commands[verb][subject].Description}");
+					writer.WriteLine($"{verb} {subject} - {commands[verb][subject].Description}");
 				}
 			}
-
-			return builder.ToString();
 		}
 	}
 }

@@ -1,6 +1,8 @@
-﻿namespace AleksandarNaumovic.EntryPoint.Commands
+﻿using AleksandarNaumovic.EntryPoint.Utilities;
+
+namespace AleksandarNaumovic.EntryPoint.Commands
 {
-	public abstract class AbstractCommand : ICommand
+	public abstract class AbstractCommand : ICommand, IInternalCommand
 	{
 		public abstract IList<ParameterInfo> ParametersDefinition { get; }
 
@@ -14,6 +16,7 @@
 		public abstract void Execute();
 
 		protected string result;
+		protected IOutputWriter outputWriter;
 
 		public string Result
 		{
@@ -26,5 +29,13 @@
 		public abstract string Description { get; }
 
 		public abstract string Usage { get; }
+
+		IOutputWriter IInternalCommand.OutputWriter
+		{
+			set
+			{
+				outputWriter = value;
+			}
+		}
 	}
 }

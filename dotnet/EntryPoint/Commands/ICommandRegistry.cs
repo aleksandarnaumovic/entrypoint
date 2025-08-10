@@ -1,4 +1,6 @@
-﻿namespace AleksandarNaumovic.EntryPoint.Commands
+﻿using AleksandarNaumovic.EntryPoint.Utilities;
+
+namespace AleksandarNaumovic.EntryPoint.Commands
 {
     internal interface ICommandRegistry
     {
@@ -6,6 +8,6 @@
 
         public ICommand Get(string verb, string subject);
 
-        public string GetRegisteredDescriptions();
+        public void WriteRegisteredDescriptions(IOutputWriter writer);
     }
 }

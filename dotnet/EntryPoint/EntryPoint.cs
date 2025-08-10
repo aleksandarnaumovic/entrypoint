@@ -1,5 +1,6 @@
 ﻿using AleksandarNaumovic.EntryPoint.Commands;
 using System.Text;
+using AleksandarNaumovic.EntryPoint.Utilities;
 
 namespace AleksandarNaumovic.EntryPoint
 {
@@ -8,34 +9,35 @@ namespace AleksandarNaumovic.EntryPoint
 		private readonly EntryPointConfiguration configuration;
 		private readonly IParametersParser parser;
 		private readonly IParametersValidator validator;
+		private readonly IOutputWriter outputWriter;
 
-		internal EntryPoint(EntryPointConfiguration configuration, IParametersParser parser, IParametersValidator validator)
+		internal EntryPoint(EntryPointConfiguration configuration, IParametersParser parser, IParametersValidator validator, IOutputWriter outputWriter)
 		{
 			this.configuration = configuration;
 			this.parser = parser;
 			this.validator = validator;
+			this.outputWriter = outputWriter;
 		}
 
-		public string Execute(string[] arguments)
+		public void Execute(string[] arguments)
 		{
-			StringBuilder builder = new StringBuilder();
-			builder.AppendLine();
-			builder.AppendLine(configuration.DefaultMessage);
-			builder.AppendLine();
+			outputWriter.WriteLine();
+			outputWriter.WriteLine(configuration.DefaultMessage);
+			outputWriter.WriteLine();
 
 			// arguments at first two positions are by convention verb and subject. That could be extended by more complex scenarios later
 			if (arguments.Length < 2)
 			{
-				builder.AppendLine(Messages.IncorrectSyntax);
-				return builder.ToString();
+				outputWriter.WriteLine(Messages.IncorrectSyntax);
+				return;
 			}
 
 			ICommand command = configuration.CommandRegistry.Get(arguments[0], arguments[1]);
 
 			if (command == null)
 			{
-				builder.Append(configuration.CommandRegistry.GetRegisteredDescriptions());
-				return builder.ToString();
+				configuration.CommandRegistry.WriteRegisteredDescriptions(outputWriter);
+				return;
 			}
 
 			IList<ParameterInfo> info = command.ParametersDefinition;
@@ -44,15 +46,15 @@ namespace AleksandarNaumovic.EntryPoint
 
 			if (!validator.Validate(info, parameters))
 			{
-				builder.AppendLine(command.Usage);
-				return builder.ToString();
+				outputWriter.WriteLine(command.Usage);
+				return;
 			}
 
+			((IInternalCommand) command).OutputWriter = outputWriter;
 			command.AddParameters(parameters);
 			command.Execute();
 
-			builder.AppendLine(command.Result);
-			return builder.ToString();
+			outputWriter.WriteLine(command.Result);
 		}
 
 		#region singleton
@@ -63,7 +65,7 @@ namespace AleksandarNaumovic.EntryPoint
 		{
 			if (instance == null)
 			{
-				instance = new EntryPoint(configuration, new ParametersParser(), new ParametersValidator());
+				instance = new EntryPoint(configuration, new ParametersParser(), new ParametersValidator(), new ConsoleDirectOutputWriter());
 			}
 			return instance;
 		}

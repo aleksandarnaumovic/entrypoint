@@ -4,7 +4,7 @@
 	{
 		public IList<ParameterInfo> ParametersDefinition { get; }
 
-		public void AddParameters(IDictionary<string, string> parameterss);
+		public void AddParameters(IDictionary<string, string> parameters);
 
 		public void Execute();
 
