@@ -45,9 +45,9 @@ namespace AleksandarNaumovic.EntryPoint.Test
 			ICommand command2 = Substitute.For<ICommand, IInternalCommand>();
 			ICommand command3 = Substitute.For<ICommand, IInternalCommand>();
 
-			config.AddCommand("do", "something", command1);
-			config.AddCommand("do", "somethingelse", command2);
-			config.AddCommand("donotdo", "something", command3);
+			config.AddCommand(["do", "something"], command1);
+			config.AddCommand(["do", "somethingelse"], command2);
+			config.AddCommand(["donotdo", "something"], command3);
 
 			IList<ParameterInfo> info = new List<ParameterInfo>();
 
@@ -110,9 +110,9 @@ namespace AleksandarNaumovic.EntryPoint.Test
 			ICommand command2 = Substitute.For<ICommand>();
 			ICommand command3 = Substitute.For<ICommand>();
 
-			config.AddCommand("do", "something", command1);
-			config.AddCommand("do", "somethingelse", command2);
-			config.AddCommand("donotdo", "something", command3);
+			config.AddCommand(["do", "something"], command1);
+			config.AddCommand(["do", "somethingelse"], command2);
+			config.AddCommand(["donotdo", "something"], command3);
 
 			command1.Description.Returns("desc 1");
 			command2.Description.Returns("desc 2");
@@ -138,9 +138,9 @@ namespace AleksandarNaumovic.EntryPoint.Test
 			ICommand command2 = Substitute.For<ICommand>();
 			ICommand command3 = Substitute.For<ICommand>();
 
-			config.AddCommand("do", "something", command1);
-			config.AddCommand("do", "somethingelse", command2);
-			config.AddCommand("donotdo", "something", command3);
+			config.AddCommand(["do", "something"], command1);
+			config.AddCommand(["do", "somethingelse"], command2);
+			config.AddCommand(["donotdo", "something"], command3);
 
 			IList<ParameterInfo> info = new List<ParameterInfo>();
 

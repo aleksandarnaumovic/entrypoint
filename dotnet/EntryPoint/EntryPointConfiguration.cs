@@ -9,7 +9,7 @@ namespace AleksandarNaumovic.EntryPoint
 
 		public EntryPointConfiguration()
 		{
-			commandRegistry = new CommandRegistry();
+			commandRegistry = new CommandRegistry(new ArrayComparator());
 			defaultMessage = Messages.DefaultMessage;
 		}
 
@@ -24,10 +24,10 @@ namespace AleksandarNaumovic.EntryPoint
 				defaultMessage = value;
 			}
 		}
-
-		public void AddCommand(string verb, string subject, ICommand command)
+		
+		public void AddCommand(string[] subcommands, ICommand command)
 		{
-			commandRegistry.Register(verb, subject, command);
+			commandRegistry.Register(subcommands, command);
 		}
 
 		internal virtual ICommandRegistry CommandRegistry

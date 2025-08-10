@@ -32,7 +32,7 @@ namespace AleksandarNaumovic.EntryPoint
 				return;
 			}
 
-			ICommand command = configuration.CommandRegistry.Get(arguments[0], arguments[1]);
+			ICommand command = configuration.CommandRegistry.Get([arguments[0], arguments[1]]);
 
 			if (command == null)
 			{

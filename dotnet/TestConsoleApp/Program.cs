@@ -10,8 +10,8 @@ namespace TestConsoleApp
 			EntryPointConfiguration config = new EntryPointConfiguration();
 			//config.DefaultMessage = "Software which should do something.";
 
-			config.AddCommand("do", "something", new DoSomethingCommand());
-			config.AddCommand("do", "another", new DoAnotherCommand());
+			config.AddCommand(["do", "something"], new DoSomethingCommand());
+			config.AddCommand(["do", "another"], new DoAnotherCommand());
 
 			EntryPoint.GetInstance(config).Execute(arguments);
 		}

@@ -31,13 +31,13 @@ namespace AleksandarNaumovic.EntryPoint.Test
 			ICommand command2 = Substitute.For<ICommand>();
 			ICommand command3 = Substitute.For<ICommand>();
 
-			config.AddCommand("do", "something", command1);
-			config.AddCommand("do", "somethingelse", command2);
-			config.AddCommand("dontdo", "something", command3);
+			config.AddCommand(["do", "something"], command1);
+			config.AddCommand(["do", "somethingelse"], command2);
+			config.AddCommand(["dontdo", "something"], command3);
 
-			Assert.AreSame(command1, config.CommandRegistry.Get("do", "something"));
-			Assert.AreSame(command2, config.CommandRegistry.Get("do", "somethingelse"));
-			Assert.AreSame(command3, config.CommandRegistry.Get("dontdo", "something"));
+			Assert.AreSame(command1, config.CommandRegistry.Get(["do", "something"]));
+			Assert.AreSame(command2, config.CommandRegistry.Get(["do", "somethingelse"]));
+			Assert.AreSame(command3, config.CommandRegistry.Get(["dontdo", "something"]));
 		}
 	}
 }

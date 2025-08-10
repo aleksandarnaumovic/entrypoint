@@ -1,47 +1,44 @@
-﻿using AleksandarNaumovic.EntryPoint.Utilities;
+﻿using System.Text;
+using AleksandarNaumovic.EntryPoint.Utilities;
 
 namespace AleksandarNaumovic.EntryPoint.Commands
 {
 	internal class CommandRegistry : ICommandRegistry
 	{
-		private IDictionary<string, IDictionary<string, ICommand>> commands;
+		private readonly IArrayComparator comparator;
+		private readonly IList<CommandRegistryEntry> entries;
 
-		public CommandRegistry()
+		public CommandRegistry(IArrayComparator comparator)
 		{
-			commands = new Dictionary<string, IDictionary<string, ICommand>>();
+			this.comparator = comparator;
+			
+			entries = new List<CommandRegistryEntry>();
 		}
 
-		public void Register(string verb, string subject, ICommand command)
+		public void Register(string[] subcommands, ICommand command)
 		{
-			GetCommandsForVerb(verb).Add(subject, command);
+			entries.Add(new CommandRegistryEntry(subcommands, command));
 		}
 
-		private IDictionary<string, ICommand> GetCommandsForVerb(string verb)
+		public ICommand Get(string[] arguments)
 		{
-			if (!commands.ContainsKey(verb))
+			foreach (CommandRegistryEntry entry in entries)
 			{
-				commands.Add(verb, new Dictionary<string, ICommand>());
+				if (comparator.Begins(entry.Key, arguments)) return entry.Command;
 			}
-			return commands[verb];
-		}
 
-		public ICommand Get(string verb, string subject)
-		{
-			if (!commands.ContainsKey(verb) || !commands[verb].ContainsKey(subject))
-			{
-				return null;
-			}
-			return commands[verb][subject];
+			return null;
+
 		}
 
 		public void WriteRegisteredDescriptions(IOutputWriter writer)
 		{
-			foreach (string verb in commands.Keys)
+			foreach (CommandRegistryEntry entry in entries)
 			{
-				foreach (string subject in commands[verb].Keys)
-				{
-					writer.WriteLine($"{verb} {subject} - {commands[verb][subject].Description}");
-				}
+				StringBuilder builder = new StringBuilder();
+				foreach (string subcommand in entry.Key) builder.Append($"{subcommand} ");
+				
+				writer.WriteLine($"{builder.ToString()}- {entry.Command.Description}");
 			}
 		}
 	}
