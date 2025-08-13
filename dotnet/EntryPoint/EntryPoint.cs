@@ -1,5 +1,4 @@
 ﻿using AleksandarNaumovic.EntryPoint.Commands;
-using System.Text;
 using AleksandarNaumovic.EntryPoint.Utilities;
 
 namespace AleksandarNaumovic.EntryPoint
@@ -7,13 +6,15 @@ namespace AleksandarNaumovic.EntryPoint
 	public class EntryPoint
 	{
 		private readonly EntryPointConfiguration configuration;
+		private readonly ICommandRegistry registry;
 		private readonly IParametersParser parser;
 		private readonly IParametersValidator validator;
 		private readonly IOutputWriter outputWriter;
 
-		internal EntryPoint(EntryPointConfiguration configuration, IParametersParser parser, IParametersValidator validator, IOutputWriter outputWriter)
+		internal EntryPoint(EntryPointConfiguration configuration, ICommandRegistry registry, IParametersParser parser, IParametersValidator validator, IOutputWriter outputWriter)
 		{
 			this.configuration = configuration;
+			this.registry = registry;
 			this.parser = parser;
 			this.validator = validator;
 			this.outputWriter = outputWriter;
@@ -26,23 +27,27 @@ namespace AleksandarNaumovic.EntryPoint
 			outputWriter.WriteLine();
 
 			// arguments at first two positions are by convention verb and subject. That could be extended by more complex scenarios later
-			if (arguments.Length < 2)
+			if (arguments.Length < 1)
 			{
 				outputWriter.WriteLine(Messages.IncorrectSyntax);
 				return;
 			}
 
-			ICommand command = configuration.CommandRegistry.Get([arguments[0], arguments[1]]);
-
-			if (command == null)
+			CommandRegistryEntry registryEntry = registry.Get(arguments);
+			if (registryEntry == null)
 			{
 				configuration.CommandRegistry.WriteRegisteredDescriptions(outputWriter);
 				return;
 			}
+			
+			ICommand command = registryEntry.Command;
+			
+			string[] parametersArray = new string[arguments.Length - registryEntry.Key.Length];
+			Array.Copy(arguments, registryEntry.Key.Length, parametersArray, 0, arguments.Length - registryEntry.Key.Length);
 
 			IList<ParameterInfo> info = command.ParametersDefinition;
 
-			IDictionary<string, string> parameters = parser.Parse(arguments.Skip(2).ToArray(), info);
+			IDictionary<string, string> parameters = parser.Parse(parametersArray, info);
 
 			if (!validator.Validate(info, parameters))
 			{
@@ -57,7 +62,12 @@ namespace AleksandarNaumovic.EntryPoint
 			outputWriter.WriteLine(command.Result);
 		}
 
-		#region singleton
+		#region creation
+
+		public static EntryPointConfiguration CreateConfiguration()
+		{
+			return new EntryPointConfiguration(new CommandRegistry(new ArrayComparator()));
+		}
 
 		private static EntryPoint instance;
 
@@ -65,11 +75,11 @@ namespace AleksandarNaumovic.EntryPoint
 		{
 			if (instance == null)
 			{
-				instance = new EntryPoint(configuration, new ParametersParser(), new ParametersValidator(), new ConsoleDirectOutputWriter());
+				instance = new EntryPoint(configuration, configuration.CommandRegistry, new ParametersParser(), new ParametersValidator(), new ConsoleDirectOutputWriter());
 			}
 			return instance;
 		}
 
-		#endregion singleton
+		#endregion creation
 	}
 }

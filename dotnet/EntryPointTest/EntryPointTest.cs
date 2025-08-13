@@ -9,6 +9,7 @@ namespace AleksandarNaumovic.EntryPoint.Test
 	[TestFixture]
 	public class EntryPointTest
 	{
+		private ICommandRegistry registry;
 		private IParametersParser parser;
 		private IParametersValidator validator;
 		private IOutputWriter outputWriter;
@@ -18,19 +19,28 @@ namespace AleksandarNaumovic.EntryPoint.Test
 		[SetUp]
 		public void SetUp()
 		{
+			registry = Substitute.For<ICommandRegistry>();
 			parser = Substitute.For<IParametersParser>();
 			validator = Substitute.For<IParametersValidator>();
 			outputWriter = Substitute.For<IOutputWriter>();
 
-			config = new EntryPointConfiguration();
+			config = EntryPoint.CreateConfiguration();
 
-			entryPoint = new EntryPoint(config, parser, validator, outputWriter);
+			entryPoint = new EntryPoint(config, registry, parser, validator, outputWriter);
+		}
+
+		[Test]
+		public void TestCreateConfiguration()
+		{
+			Assert.IsNotNull(EntryPoint.CreateConfiguration());
+			
+			Assert.AreNotSame(EntryPoint.CreateConfiguration(), EntryPoint.CreateConfiguration());
 		}
 
 		[Test]
 		public void TestGetInstance()
 		{
-			EntryPointConfiguration config = new EntryPointConfiguration();
+			EntryPointConfiguration config = EntryPoint.CreateConfiguration();
 
 			Assert.NotNull(EntryPoint.GetInstance(config));
 			Assert.AreSame(EntryPoint.GetInstance(config), EntryPoint.GetInstance(config));
@@ -39,6 +49,8 @@ namespace AleksandarNaumovic.EntryPoint.Test
 		[Test]
 		public void TestExecute()
 		{
+			string[] arguments = ["do", "something", "--param1", "value1", "--param2", "value2", "--param3", "value3"];
+
 			config.DefaultMessage = "default message";
 
 			ICommand command1 = Substitute.For<ICommand, IInternalCommand>();
@@ -55,6 +67,10 @@ namespace AleksandarNaumovic.EntryPoint.Test
 			info.Add(new ParameterInfo("param2", false));
 			info.Add(new ParameterInfo("param3", true));
 
+			CommandRegistryEntry registryEntry = new CommandRegistryEntry(["do", "something"], command1);
+
+			registry.Get(arguments).Returns(registryEntry);
+
 			command1.ParametersDefinition.Returns(info);
 
 			IDictionary<string, string> parameters = new Dictionary<string, string>();
@@ -69,13 +85,15 @@ namespace AleksandarNaumovic.EntryPoint.Test
 
 			command1.Result.Returns("result message");
 
-			entryPoint.Execute(["do", "something", "--param1", "value1", "--param2", "value2", "--param3", "value3"]);
+			entryPoint.Execute(arguments);
 
 			outputWriter.Received().WriteLine();
 			outputWriter.Received().WriteLine("default message");
 			outputWriter.Received().WriteLine();
 			
 			outputWriter.Received().WriteLine("result message");
+			
+			registry.Received().Get(arguments);
 			
 			_ = command1.Received().ParametersDefinition;
 
@@ -92,18 +110,52 @@ namespace AleksandarNaumovic.EntryPoint.Test
 		[Test]
 		public void TestExecuteInsufficientArguments()
 		{
-			entryPoint.Execute(["justdo"]);
+			entryPoint.Execute([]);
 
 			outputWriter.Received().WriteLine();
 			outputWriter.Received().WriteLine("EntryPoint v1.0.0 (C) Aleksandar Naumovic 2024.");
 			outputWriter.Received().WriteLine();
 			
-			outputWriter.Received().WriteLine("Invalid command. Please try <verb> <subject> arguments.... form.");
+			outputWriter.Received().WriteLine("Invalid command. Please try <subcommand> <subcommand> <subcommand> arguments.... form.");
+		}
+
+		[Test]
+		public void TestExecuteSufficientArguments()
+		{
+			string[] arguments = ["justdo"];
+
+			ICommand command1 = Substitute.For<ICommand>();
+			ICommand command2 = Substitute.For<ICommand>();
+			ICommand command3 = Substitute.For<ICommand>();
+
+			config.AddCommand(["do", "something"], command1);
+			config.AddCommand(["do", "somethingelse"], command2);
+			config.AddCommand(["donotdo", "something"], command3);
+
+			command1.Description.Returns("desc 1");
+			command2.Description.Returns("desc 2");
+			command3.Description.Returns("desc 3");
+			
+			registry.Get(arguments).Returns((CommandRegistryEntry) null);
+
+			entryPoint.Execute(arguments);
+
+			outputWriter.Received().WriteLine();
+			outputWriter.Received().WriteLine("EntryPoint v1.0.0 (C) Aleksandar Naumovic 2024.");
+			outputWriter.Received().WriteLine();
+			
+			registry.Received().Get(arguments);
+				
+			outputWriter.Received().WriteLine("do something - desc 1");
+			outputWriter.Received().WriteLine("do somethingelse - desc 2");
+			outputWriter.Received().WriteLine("donotdo something - desc 3");
 		}
 
 		[Test]
 		public void TestExecuteCommandNotFound()
 		{
+			string[] arguments = ["not", "found"];
+
 			config.DefaultMessage = "default message";
 
 			ICommand command1 = Substitute.For<ICommand>();
@@ -118,11 +170,15 @@ namespace AleksandarNaumovic.EntryPoint.Test
 			command2.Description.Returns("desc 2");
 			command3.Description.Returns("desc 3");
 
-			entryPoint.Execute(["not", "found"]);
+			registry.Get(arguments).Returns((CommandRegistryEntry) null);
+
+			entryPoint.Execute(arguments);
 
 			outputWriter.Received().WriteLine();
 			outputWriter.Received().WriteLine("default message");
 			outputWriter.Received().WriteLine();
+
+			registry.Received().Get(arguments);
 			
 			outputWriter.Received().WriteLine("do something - desc 1");
 			outputWriter.Received().WriteLine("do somethingelse - desc 2");
@@ -132,6 +188,8 @@ namespace AleksandarNaumovic.EntryPoint.Test
 		[Test]
 		public void TestExecuteInvalidArguments()
 		{
+			string[] arguments = ["do", "something", "--param1", "value1", "--param2", "value2", "--param3", "value3"];
+
 			config.DefaultMessage = "default message";
 
 			ICommand command1 = Substitute.For<ICommand>();
@@ -147,6 +205,10 @@ namespace AleksandarNaumovic.EntryPoint.Test
 			info.Add(new ParameterInfo("param1", true));
 			info.Add(new ParameterInfo("param2", false));
 			info.Add(new ParameterInfo("param3", true));
+			
+			CommandRegistryEntry registryEntry = new CommandRegistryEntry(["do", "something"], command1);
+
+			registry.Get(arguments).Returns(registryEntry);
 
 			command1.ParametersDefinition.Returns(info);
 
@@ -162,13 +224,15 @@ namespace AleksandarNaumovic.EntryPoint.Test
 
 			command1.Usage.Returns("usage message");
 
-			entryPoint.Execute(["do", "something", "--param1", "value1", "--param2", "value2", "--param3", "value3"]);
+			entryPoint.Execute(arguments);
 
 			outputWriter.Received().WriteLine();
 			outputWriter.Received().WriteLine("default message");
 			outputWriter.Received().WriteLine();
 			
 			outputWriter.Received().WriteLine("usage message");
+
+			registry.Received().Get(arguments);
 
 			_ = command1.Received().ParametersDefinition;
 

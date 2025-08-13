@@ -19,18 +19,11 @@ namespace AleksandarNaumovic.EntryPoint.Test.Commands
 	        
 	        registry = new CommandRegistry(comparator);
         }
-
-		[Test]
-		public void TestRegisterVerbTwice()
-		{
-			registry.Register(["test", "command"], new TestCommand());
-			registry.Register(["test", "other"], new TestCommand());
-		}
 		
         [Test]
         public void TestGetWithoutRegistration()
         {
-            Assert.IsNull(registry.Get(["not", "existing"]));
+            Assert.IsNull(registry.GetCommand(["not", "existing"]));
         }
 
         [Test]
@@ -41,15 +34,15 @@ namespace AleksandarNaumovic.EntryPoint.Test.Commands
             registry.Register(["test", "command"], command);
 
             comparator.Begins(
-	            Arg.Is<string[]>(arr => arr.SequenceEqual(new[] { "test", "command" })),
-	            Arg.Is<string[]>(arr => arr.SequenceEqual(new[] { "test", "non-existing" })))
+	            Arg.Is<string[]>(arr => arr.SequenceEqual(new[] { "test", "non-existing" })),
+				Arg.Is<string[]>(arr => arr.SequenceEqual(new[] { "test", "command" })))
 	            .Returns(false);
 
             Assert.IsNull(registry.Get(["test", "non-existing"]));
 
             comparator.Received().Begins(
-	            Arg.Is<string[]>(arr => arr.SequenceEqual(new[] {"test", "command"})),
-	            Arg.Is<string[]>(arr => arr.SequenceEqual(new[] {"test", "non-existing"}))
+	            Arg.Is<string[]>(arr => arr.SequenceEqual(new[] {"test", "non-existing"})),
+	            Arg.Is<string[]>(arr => arr.SequenceEqual(new[] {"test", "command"}))
 			);
         }
 
@@ -61,15 +54,17 @@ namespace AleksandarNaumovic.EntryPoint.Test.Commands
             registry.Register(["test", "command"], command);
 
             comparator.Begins(
-	            Arg.Is<string[]>(arr => arr.SequenceEqual(new[] {"test", "command"})),
-	            Arg.Is<string[]>(arr => arr.SequenceEqual(new[] {"test", "command", "--param1", "value1"})))
+	            Arg.Is<string[]>(arr => arr.SequenceEqual(new[] {"test", "command", "--param1", "value1"})),
+	            Arg.Is<string[]>(arr => arr.SequenceEqual(new[] {"test", "command"}))
+	            )
 	            .Returns(true);
 
-            Assert.AreSame(command, registry.Get(["test", "command", "--param1", "value1"]));
+            Assert.AreSame(command, registry.Get(["test", "command", "--param1", "value1"]).Command);
 
             comparator.Received().Begins(
-	            Arg.Is<string[]>(arr => arr.SequenceEqual(new[] {"test", "command"})),
-	            Arg.Is<string[]>(arr => arr.SequenceEqual(new[] {"test", "command", "--param1", "value1"}))
+	            
+	            Arg.Is<string[]>(arr => arr.SequenceEqual(new[] {"test", "command", "--param1", "value1"})),
+	            Arg.Is<string[]>(arr => arr.SequenceEqual(new[] {"test", "command"}))
             );
         }
 

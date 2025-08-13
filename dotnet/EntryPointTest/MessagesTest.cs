@@ -15,7 +15,7 @@ namespace AleksandarNaumovic.EntryPoint.Test
 		[Test]
 		public void TestIncorrectSyntax()
 		{
-			Assert.AreEqual("Invalid command. Please try <verb> <subject> arguments.... form.", Messages.IncorrectSyntax);
+			Assert.AreEqual("Invalid command. Please try <subcommand> <subcommand> <subcommand> arguments.... form.", Messages.IncorrectSyntax);
 		}
 	}
 }

@@ -7,9 +7,9 @@ namespace AleksandarNaumovic.EntryPoint
 		private ICommandRegistry commandRegistry;
 		private string defaultMessage;
 
-		public EntryPointConfiguration()
+		internal EntryPointConfiguration(ICommandRegistry registry)
 		{
-			commandRegistry = new CommandRegistry(new ArrayComparator());
+			commandRegistry = registry;
 			defaultMessage = Messages.DefaultMessage;
 		}
 

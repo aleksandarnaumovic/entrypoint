@@ -6,7 +6,7 @@ namespace AleksandarNaumovic.EntryPoint.TestConsoleApp
 	{
 		public static void Main(string[] arguments)
 		{
-			EntryPointConfiguration config = new EntryPointConfiguration();
+			EntryPointConfiguration config = EntryPoint.CreateConfiguration();
 			//config.DefaultMessage = "Software which should do something.";
 
 			config.AddCommand(["create", "entity"], new EntityCreationCommand());

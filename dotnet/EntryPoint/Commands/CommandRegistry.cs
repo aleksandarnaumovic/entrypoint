@@ -20,11 +20,21 @@ namespace AleksandarNaumovic.EntryPoint.Commands
 			entries.Add(new CommandRegistryEntry(subcommands, command));
 		}
 
-		public ICommand Get(string[] arguments)
+		public CommandRegistryEntry Get(string[] arguments)
 		{
 			foreach (CommandRegistryEntry entry in entries)
 			{
-				if (comparator.Begins(entry.Key, arguments)) return entry.Command;
+				if (comparator.Begins(arguments, entry.Key)) return entry;
+			}
+
+			return null;
+		}
+
+		public ICommand GetCommand(string[] arguments)
+		{
+			foreach (CommandRegistryEntry entry in entries)
+			{
+				if (comparator.Begins(arguments, entry.Key)) return entry.Command;
 			}
 
 			return null;
