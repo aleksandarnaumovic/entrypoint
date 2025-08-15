@@ -35,5 +35,11 @@ namespace AleksandarNaumovic.EntryPoint.Test.Commands
 
 			Assert.AreEqual("new result", command.Result);
 		}
+		
+		[Test]
+		public void TestIncludeInHelpDefault()
+		{
+			Assert.True(command.IncludeInHelp);
+		}
 	}
 }

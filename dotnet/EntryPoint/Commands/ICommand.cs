@@ -10,6 +10,8 @@
 
 		public string Result { get; }
 
+		bool IncludeInHelp { get; }
+
 		public string Description { get; }
 
 		public string Usage {  get; }

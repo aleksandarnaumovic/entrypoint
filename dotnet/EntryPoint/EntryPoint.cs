@@ -36,7 +36,7 @@ namespace AleksandarNaumovic.EntryPoint
 			CommandRegistryEntry registryEntry = registry.Get(arguments);
 			if (registryEntry == null)
 			{
-				configuration.CommandRegistry.WriteRegisteredDescriptions(outputWriter);
+				registry.WriteRegisteredDescriptions(outputWriter);
 				return;
 			}
 			
@@ -66,7 +66,11 @@ namespace AleksandarNaumovic.EntryPoint
 
 		public static EntryPointConfiguration CreateConfiguration()
 		{
-			return new EntryPointConfiguration(new CommandRegistry(new ArrayComparator()));
+			CommandRegistry registry = new CommandRegistry(new ArrayComparator());
+			
+			registry.Register(["help"], new HelpCommand(new ConsoleDirectOutputWriter(), registry));
+			
+			return new EntryPointConfiguration(registry);
 		}
 
 		private static EntryPoint instance;

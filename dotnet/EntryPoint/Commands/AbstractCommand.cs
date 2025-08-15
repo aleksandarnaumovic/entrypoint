@@ -26,6 +26,16 @@ namespace AleksandarNaumovic.EntryPoint.Commands
 			}
 		}
 
+		protected bool includeInHelp = true;
+
+		public bool IncludeInHelp
+		{
+			get
+			{
+				return includeInHelp;
+			}
+		}
+
 		public abstract string Description { get; }
 
 		public abstract string Usage { get; }

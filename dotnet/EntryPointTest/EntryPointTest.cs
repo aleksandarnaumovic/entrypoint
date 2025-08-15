@@ -38,6 +38,12 @@ namespace AleksandarNaumovic.EntryPoint.Test
 		}
 
 		[Test]
+		public void TestCreateConfigurationWithHelpCommand()
+		{
+			Assert.AreEqual(typeof(HelpCommand), EntryPoint.CreateConfiguration().CommandRegistry.Get(["help"]).Command.GetType());
+		}
+
+		[Test]
 		public void TestGetInstance()
 		{
 			EntryPointConfiguration config = EntryPoint.CreateConfiguration();
@@ -137,6 +143,8 @@ namespace AleksandarNaumovic.EntryPoint.Test
 			command3.Description.Returns("desc 3");
 			
 			registry.Get(arguments).Returns((CommandRegistryEntry) null);
+			
+			registry.WriteRegisteredDescriptions(outputWriter);
 
 			entryPoint.Execute(arguments);
 
@@ -145,10 +153,8 @@ namespace AleksandarNaumovic.EntryPoint.Test
 			outputWriter.Received().WriteLine();
 			
 			registry.Received().Get(arguments);
-				
-			outputWriter.Received().WriteLine("do something - desc 1");
-			outputWriter.Received().WriteLine("do somethingelse - desc 2");
-			outputWriter.Received().WriteLine("donotdo something - desc 3");
+
+			registry.Received().WriteRegisteredDescriptions(outputWriter);
 		}
 
 		[Test]
@@ -171,6 +177,8 @@ namespace AleksandarNaumovic.EntryPoint.Test
 			command3.Description.Returns("desc 3");
 
 			registry.Get(arguments).Returns((CommandRegistryEntry) null);
+			
+			registry.WriteRegisteredDescriptions(outputWriter);
 
 			entryPoint.Execute(arguments);
 
@@ -179,10 +187,8 @@ namespace AleksandarNaumovic.EntryPoint.Test
 			outputWriter.Received().WriteLine();
 
 			registry.Received().Get(arguments);
-			
-			outputWriter.Received().WriteLine("do something - desc 1");
-			outputWriter.Received().WriteLine("do somethingelse - desc 2");
-			outputWriter.Received().WriteLine("donotdo something - desc 3");
+
+			registry.Received().WriteRegisteredDescriptions(outputWriter);
 		}
 
 		[Test]

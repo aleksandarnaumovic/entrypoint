@@ -76,14 +76,22 @@ namespace AleksandarNaumovic.EntryPoint.Test.Commands
 	        ICommand command1 = Substitute.For<ICommand>();
             ICommand command2 = Substitute.For<ICommand>();
             ICommand command3 = Substitute.For<ICommand>();
+            ICommand skipCommand = Substitute.For<ICommand>();
 
             command1.Description.Returns("Cmd 1 description.");
 			command2.Description.Returns("Cmd 2 description.");
 			command3.Description.Returns("Cmd 3 description.");
+			skipCommand.Description.Returns("Skip description.");
+			
+			command1.IncludeInHelp.Returns(true);
+			command2.IncludeInHelp.Returns(true);
+			command3.IncludeInHelp.Returns(true);
+			skipCommand.IncludeInHelp.Returns(false);
 
             registry.Register(["do", "something"], command1);
             registry.Register(["do", "somethingelse"], command2);
             registry.Register(["doelse", "something"], command3);
+            registry.Register(["skip"], skipCommand);
 
             // Assert.AreEqual("do something - Cmd 1 description.\r\ndo somethingelse - Cmd 2 description.\r\ndoelse something - Cmd 3 description.\r\n", registry.GetRegisteredDescriptions());
             registry.WriteRegisteredDescriptions(writer);
@@ -92,9 +100,10 @@ namespace AleksandarNaumovic.EntryPoint.Test.Commands
 			_ = command2.Received().Description;
 			_ = command3.Received().Description;
 			
-			writer.WriteLine("do something - Cmd 1 description.");
-			writer.WriteLine("do somethingelse - Cmd 2 description.");
-			writer.WriteLine("doelse something - Cmd 3 description.");
+			writer.Received().WriteLine("do something - Cmd 1 description.");
+			writer.Received().WriteLine("do somethingelse - Cmd 2 description.");
+			writer.Received().WriteLine("doelse something - Cmd 3 description.");
+			writer.DidNotReceive().WriteLine("skip - Skip description.");
         }
     }
 }

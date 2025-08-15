@@ -45,6 +45,8 @@ namespace AleksandarNaumovic.EntryPoint.Commands
 		{
 			foreach (CommandRegistryEntry entry in entries)
 			{
+				if (!entry.Command.IncludeInHelp) continue;
+				
 				StringBuilder builder = new StringBuilder();
 				foreach (string subcommand in entry.Key) builder.Append($"{subcommand} ");
 				
