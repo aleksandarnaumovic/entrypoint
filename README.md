@@ -44,7 +44,7 @@ When using AbstractCommand, you need to implement the following:
 
 6. In Program entry point, add the code with commands registration and endpoint execution.
 
-
+```
     EntryPointConfiguration config = EntryPoint.CreateConfiguration(); 
     config.DefaultMessage = "Software which should do something.";
     
@@ -54,4 +54,4 @@ When using AbstractCommand, you need to implement the following:
     config.AddCommand(["update", "entity"], new EntityUpdateCommand());
 
     EntryPoint.GetInstance(config).Execute(arguments);
-
+```
